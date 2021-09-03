@@ -1,13 +1,7 @@
-<!-- CODE ENABLES FREE ITEM REMOVE ----->
-
-<!-- Changes
-- Remove HEXTOM USB (ultimate shipping booster), lines 32-34, and replace with hard code of Free Shipping
-- commented out
-	span class 'tdf-cart-item-t' (part of old app code?)
-	spans with classes 'so-cart-discount-notes', 'so-cart-item-up-notes (HEXTOM usb)
-    spans with classes 'booster-cart-item-success-notes', 'booster-cart-item-upsell-notes' (HEXTOM usb)
-- added div class 'free-ship-usb-replacement' and p class 'free-shipping' to hard code Free Shipping that replaces HEXTOM code
--->
+<!---------------------------------------------
+Use in conjunction with vendor.js
+- remove if statement that hides X for freeProd
+----------------------------------------------->
 
 <script class="cartFlagX"></script><div class="page-width product-list cart" data-section-id="{{ section.id }}" data-section-type="cart-template">
   <div class="container">
@@ -35,24 +29,11 @@
                     <div class="list-view-item__title">
                       <a href="{{ item.url }}">
                         {{ item.product.title }}
-						<!--hextom related   
-							<span class=tdf-cart-item-t></span>  
-						  ------------------->                         
-                        
-                        <!-- removed HEXTOM hextom_usb_cart include that added Free Shipping under each product line item
-						--------------------
-						------------------------------------->
-                        
-                        <!-- HEXTOM related? or old app code
-                        <span class="so-cart-discount-notes" data-key="{{item.key}}"></span><span class="so-cart-item-up-notes" data-key="{{item.key}}"></span>
-                        <span class='booster-cart-item-success-notes' data-key='{{item.key}}'></span><span class='booster-cart-item-upsell-notes' data-key='{{item.key}}'></span>
-						---------------->                        
-                        
-                        <!-- hard code of HEXTOM replacement free shipping ------->
-                          <style>
-                            .free-ship-usb-replacement {margin-top:5px;}
-                            .free-shipping {font-family: 'Montserrat'; color:#76b0a4; font-size:14px;}
-                          </style>
+                        <!--- FREE SHIPPING for everything --->
+                        <style>
+                          .free-ship-usb-replacement {margin-top:5px;}
+                          .free-shipping {font-family: 'Montserrat'; color:#76b0a4; font-size:14px;}
+                        </style>
                         <div class="free-ship-usb-replacement">
                           <p class="free-shipping">Free Shipping</p>
                         </div>
@@ -144,19 +125,24 @@
                     {% endfor %}
                   </td>
                   <td class="remove-td">
-                    {%comment%} <!-- remove if statement to enable product deletion when script is off -->
-					{% if freeProd == false %}
+                    
+                    <!-- remove if statement to enable product deletion when script is off -->
+					{%comment%}
+                    {% if freeProd == false %}
                     <p class="remove-btn-wrap">
                       <a href="/cart/change?line={{ forloop.index }}&amp;quantity=0" class="btn btn--small btn--secondary cart__remove"><img class="remove__image" src="{{ 'Cross.svg' | file_url }}" alt="Remove Button">
                         {% comment %}{{ 'cart.general.remove' | t }}{% endcomment %}</a>
                     </p>
                     {% endif %}
-                    {%endcomment%}<!------------>
-                    
+                    {%endcomment%}
+                    <!----------------------------------------------------------------------->
+                                  
+                    <!-- shows X button to remove free item, use in conjuntion with vendor.js --->
                     <p class="remove-btn-wrap">
                       <a href="/cart/change?line={{ forloop.index }}&amp;quantity=0" class="btn btn--small btn--secondary cart__remove"><img class="remove__image" src="{{ 'Cross.svg' | file_url }}" alt="Remove Button">
                         {% comment %}{{ 'cart.general.remove' | t }}{% endcomment %}</a>
                     </p>
+                    <!--------------------------------------------------------------------------->
                     
                   </td>
                 </tr>
