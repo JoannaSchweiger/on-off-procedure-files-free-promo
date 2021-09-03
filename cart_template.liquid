@@ -1,0 +1,230 @@
+<!-- Changes
+- Remove HEXTOM USB (ultimate shipping booster), lines 32-34, and replace with hard code of Free Shipping
+- commented out
+	span class 'tdf-cart-item-t' (part of old app code?)
+	spans with classes 'so-cart-discount-notes', 'so-cart-item-up-notes (HEXTOM usb)
+    spans with classes 'booster-cart-item-success-notes', 'booster-cart-item-upsell-notes' (HEXTOM usb)
+- added div class 'free-ship-usb-replacement' and p class 'free-shipping' to hard code Free Shipping that replaces HEXTOM code
+-->
+
+<script class="cartFlagX"></script><div class="page-width product-list cart" data-section-id="{{ section.id }}" data-section-type="cart-template">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        {% if cart.item_count > 0 %}
+        <div class="product-right clearfix">
+          <form action="/cart" method="post" novalidate class="cart">
+            <table>
+              <thead class="cart__row cart__header">
+                <th colspan="2">{{ 'cart.label.product' | t }}</th>
+                <th>{{ 'cart.label.price' | t }}</th>
+                <th class="text-center">{{ 'cart.label.quantity' | t }}</th>
+                <th class="text-right">{{ 'cart.label.total' | t }}</th>
+              </thead>
+              <tbody class="cart-container">
+                {% for item in cart.items %}
+                <tr class="cart-added cart__row border-bottom th_pb_cart_line" data id="{{ item.id}}" data-index="{{ forloop.index }} cart-flex{% if forloop.first %} border-top{% endif %}" data-idth="{{ item.id }}" data-indexth="{{ forloop.index }}">
+                  <td class="cart__image-wrapper cart-flex-item">
+                    <a href="{{ item.url | within: collections.all }}">
+                      <img class="cart__image" src="{{ item | img_url: '95x95', scale: 2 }}" alt="{{ item.title | escape }}">
+                    </a>
+                  </td>
+                  <td class="cart__meta small--text-left cart-flex-item">
+                    <div class="list-view-item__title">
+                      <a href="{{ item.url }}">
+                        {{ item.product.title }}
+						<!--hextom related   
+							<span class=tdf-cart-item-t></span>  
+						  ------------------->                         
+                        
+                        <!-- removed HEXTOM hextom_usb_cart include that added Free Shipping under each product line item
+						--------------------
+						------------------------------------->
+                        
+                        <!-- HEXTOM related? or old app code
+                        <span class="so-cart-discount-notes" data-key="{{item.key}}"></span><span class="so-cart-item-up-notes" data-key="{{item.key}}"></span>
+                        <span class='booster-cart-item-success-notes' data-key='{{item.key}}'></span><span class='booster-cart-item-upsell-notes' data-key='{{item.key}}'></span>
+						---------------->                        
+                        
+                        <!-- hard code of HEXTOM replacement free shipping ------->
+                          <style>
+                            .free-ship-usb-replacement {margin-top:5px;}
+                            .free-shipping {font-family: 'Montserrat'; color:#76b0a4; font-size:14px;}
+                          </style>
+                        <div class="free-ship-usb-replacement">
+                          <p class="free-shipping">Free Shipping</p>
+                        </div>
+                        <!--------------------------->
+                        
+                        {% if item.quantity > 1 %}
+                        <span class="medium-up--hide"><span class="visually-hidden">{{ 'cart.label.quantity' | t }}</span>(x{{ item.quantity }})</span>
+                        {% endif %}
+                      </a>
+                    </div>
+                    {% unless item.variant.title contains 'Default' %}
+                    <div class="cart__meta-text">
+                      {% for option in item.product.options %}
+                      {{ option }}: {{ item.variant.options[forloop.index0] }}<br/>
+                      {% endfor %}
+                    </div>
+                    {% endunless %}
+
+                    {% comment %}
+                    Optional, loop through custom product line items if available
+
+                    Line item properties come in as having two parts. The first part will be passed with the default form,
+                    but p.last is the actual custom property and may be blank. If it is, don't show it.
+
+                    For more info on line item properties, visit:
+                    - http://docs.shopify.com/support/your-store/products/how-do-I-collect-additional-information-on-the-product-page-Like-for-a-monogram-engraving-or-customization
+                    {% endcomment %}
+                    {%- assign property_size = item.properties | size -%}
+                    {% assign freeProd = false %} <!-- free product code -->
+                    {% if property_size > 0 %}
+                    <div class="cart__meta-text">
+                      <span class="th_bundle_discount_text"></span>
+                      {% for p in item.properties %}
+                      	{% if p.first == '_free_item_with_furniture' %}
+                      	{% assign freeProd = true %}
+                      	{% endif %}
+                      {% assign first_character_in_key = p.first | truncate: 1, '' %}
+                      {% if p.first contains 'th_bundle_' -%}{% continue -%}{% endif -%}
+                      {% unless p.last == blank or first_character_in_key == '_' %}
+                      {{ p.first }}:
+                      {% comment %}
+                      Check if there was an uploaded file associated
+                      {% endcomment %}
+                      {% if p.last contains '/uploads/' %}
+                      <a href="{{ p.last }}">{{ p.last | split: '/' | last }}</a>
+                      {% else %}
+                      {{ p.last }}
+                      {% endif %}
+                      {% endunless %}
+                      {% endfor %}
+                    </div>
+                    {% endif %}
+
+                  </td>
+                  <td class="cart__price-wrapper cart-flex-item">
+                    <span class="so-cart-item-price" data-key="{{item.key}}"><span class="th_item_price"><span class="tdf-cart-item-p-p {% if freeProd == true %} hide {% endif %}" >{{ item.price | money }}</span></span></span>
+                    {% for discount in item.discounts %}
+                    <div class="cart-item__discount medium-up--hide">{{ discount.title }}</div>
+                    {% endfor %}
+                    <div class="cart__edit medium-up--hide">
+                      <button type="button" class="btn btn--secondary btn--small js-edit-toggle cart__edit--active" data-target="line{{ forloop.index }}">
+                        <span class="cart__edit-text--edit">{{ 'cart.general.edit' | t }}</span>
+                        <span class="cart__edit-text--cancel">{{ 'cart.general.cancel' | t }}</span>
+                      </button>
+                    </div>
+                  </td>
+                  <td class="cart__update-wrapper cart-flex-item text-right">
+                   {% if freeProd == false %}
+                    <a href="/cart/change?line={{ forloop.index }}&amp;quantity=0" class="btn btn--small btn--secondary cart__remove medium-up--hide">{{ 'cart.general.remove' | t }}</a>
+                    <div class="cart__qty">
+                      <label for="updates_{{ item.key }}" class="cart__qty-label">{{ 'cart.label.quantity' | t }}</label>
+                      <input class="cart__qty-input" type="number" name="updates[]" id="updates_{{ item.key }}" value="{{ item.quantity }}" min="0" pattern="[0-9]*">
+                    </div>
+                    <input type="submit" name="update" class="btn btn--small cart__update medium-up--hide" value="{{ 'cart.general.update' | t }}">
+                    {% endif %}
+                  </td>
+                  <td class="text-right small--hide">
+                    {% if item.original_line_price != item.line_price %}
+                    <div class="cart-item__original-price {% if freeProd == true %} hide {% endif %}"><s>{{ item.original_line_price | money }}</s></div>
+                    {% endif %}
+
+                    <div>
+                      <span class='booster-cart-item-line-price' data-key='{{item.key}}'></span>
+                      <span class="so-cart-item-line-price" data-key="{{item.key}}"></span>
+                    </div>
+
+                    {% for discount in item.discounts %}
+                    <div class="cart-item__discount">{{ discount.title }}</div>
+                    {% endfor %}
+                  </td>
+                  <td class="remove-td">
+                    {% if freeProd == false %}
+                    <p class="remove-btn-wrap">
+                      <a href="/cart/change?line={{ forloop.index }}&amp;quantity=0" class="btn btn--small btn--secondary cart__remove"><img class="remove__image" src="{{ 'Cross.svg' | file_url }}" alt="Remove Button">
+                        {% comment %}{{ 'cart.general.remove' | t }}{% endcomment %}</a>
+                    </p>
+                    {% endif %}
+                  </td>
+                </tr>
+             {% endfor %}
+              </tbody>
+            </table>
+
+            <footer class="cart__footer">
+              <div class="grid">
+                {% if section.settings.cart_notes_enable %}
+                <div class="grid__item medium-up--one-half cart-note">
+                  <label for="CartSpecialInstructions" class="cart-note__label small--text-center">{{ 'cart.general.note' | t }}</label>
+                  <textarea name="note" id="CartSpecialInstructions" class="cart-note__input">{{ cart.note }}</textarea>
+                </div>
+                {% endif %}
+                <div class="two-col-wrap-cart clearfix">
+                  <div class="left-col">
+                    <a href="javascript:history.go(-1)" class="btn btn--secondary cart__update cart__continue--large" >{{ 'cart.general.continue_shopping' | t }}</a>
+                    <input type="submit" name="update" class="btn btn--secondary cart__update cart__update--large" value="{{ 'cart.general.update' | t }}"></div>
+                  <div class="right-col">
+                    <div>
+                      <span class="cart__subtotal-title">{{ 'cart.general.subtotal' | t }}</span>
+                      <span class="cart__subtotal"><span class=""><span class="so-cart-original-total">
+                        <span class="th_cart_total_price"><span style="display:none" class="tdf-cart-total-flag"></span>{{ cart.total_price | money }}</span></span><div class="so-summary"></div><span class="so-cart-total"></span></span><span class="wh-cart-total"></span><div class="additional-notes"><span class="wh-minimums-note"></span><span class="wh-extra-note "></span></div></span>
+                    </div>
+                  </div>
+                </div>
+                <div class="full-chk-out-btn-wrap">
+                  <div class="cm-check-out-wrap">
+                    {% if cart.total_discounts > 0 %}
+                    <div class="cart__savings">
+                      {{ 'cart.general.savings' | t }}
+                      <span class="cart__savings-amount">{{ cart.total_discounts | money }}</span>
+                    </div>
+                    {% endif %}
+                    <input type="submit" name="checkout" class="btn btn--small-wide check-out-btn" value="{{ 'cart.general.checkout' | t }}">
+                    <div class="cart__shipping">{{ 'cart.general.shipping_at_checkout' | t }}</div>
+                    {% comment %}
+                    {% if additional_checkout_buttons %}
+                    <div class="additional-checkout-buttons">{{ content_for_additional_checkout_buttons }}</div>
+                    {% endif %}
+                    {% endcomment %}
+                  </div>
+                </div>
+              </div>
+            </footer>
+          </form>
+
+        </div>
+        {% else %}
+        <div class="empty-page-content text-center">
+          <img alt="" src="{{ 'empty_cart.svg' | file_url}}" class="empty-img"/>
+          <h2>{{ 'cart.general.title' | t }}</h2>
+          <p class="cart--empty-message">{{ 'cart.general.empty' | t }}</p>
+          <div class="cookie-message">
+            <p>{{ 'cart.general.cookies_required' | t }}</p>
+          </div>
+          <a href="/" class="btn btn--has-icon-after cart__continue-btn">{{ 'general.404.link' | t }}{% include 'icon-arrow-right' %}</a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+{% schema %}
+  {
+    "name": "Cart page",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "cart_notes_enable",
+        "label": "Enable cart notes",
+        "default": false
+      }
+    ]
+  }
+{% endschema %}
