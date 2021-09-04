@@ -1,3 +1,13 @@
+<!---
+Default cart is setup to support free item promo
+variable for free line item: 
+*freeProd*
+
+variable from script: 
+*_free_item_with_furniture*
+
+----->
+
 <script class="cartFlagX"></script><div class="page-width product-list cart" data-section-id="{{ section.id }}" data-section-type="cart-template">
   <div class="container">
     <div class="row">
@@ -24,19 +34,6 @@
                     <div class="list-view-item__title">
                       <a href="{{ item.url }}">
                         {{ item.product.title }}
-						<!--hextom related   
-							<span class=tdf-cart-item-t></span>  
-						  ------------------->                         
-                        
-                        <!-- removed HEXTOM hextom_usb_cart include that added Free Shipping under each product line item
-						--------------------
-						------------------------------------->
-                        
-                        <!-- HEXTOM related? or old app code
-                        <span class="so-cart-discount-notes" data-key="{{item.key}}"></span><span class="so-cart-item-up-notes" data-key="{{item.key}}"></span>
-                        <span class='booster-cart-item-success-notes' data-key='{{item.key}}'></span><span class='booster-cart-item-upsell-notes' data-key='{{item.key}}'></span>
-						---------------->                        
-                        
                         <!-- hard code of HEXTOM replacement free shipping ------->
                           <style>
                             .free-ship-usb-replacement {margin-top:5px;}
@@ -70,14 +67,22 @@
                     - http://docs.shopify.com/support/your-store/products/how-do-I-collect-additional-information-on-the-product-page-Like-for-a-monogram-engraving-or-customization
                     {% endcomment %}
                     {%- assign property_size = item.properties | size -%}
-                    {% assign freeProd = false %} <!-- free product code -->
+                    
+                    <!-- create freeProd variable for free promotions -->
+                    {% assign freeProd = false %}
+                    <!-------------------------------------------------->
+                    
                     {% if property_size > 0 %}
                     <div class="cart__meta-text">
                       <span class="th_bundle_discount_text"></span>
                       {% for p in item.properties %}
-                      	{% if p.first == '_free_item_with_furniture' %}
+                      
+                      	<!-- establishes script variable search for free product line items -->
+                      	{% if p.first == '_free_item_with_furniture' %} <!-- needs to match variable in script -->
                       	{% assign freeProd = true %}
                       	{% endif %}
+                      	<!------------------------------------------------------->
+                      
                       {% assign first_character_in_key = p.first | truncate: 1, '' %}
                       {% if p.first contains 'th_bundle_' -%}{% continue -%}{% endif -%}
                       {% unless p.last == blank or first_character_in_key == '_' %}
@@ -133,12 +138,17 @@
                     {% endfor %}
                   </td>
                   <td class="remove-td">
+                    
+                    <!--hides X to prevent confusion when free item is being 
+						autoinjected into cart, remove if statement during active promo --->
                     {% if freeProd == false %}
                     <p class="remove-btn-wrap">
                       <a href="/cart/change?line={{ forloop.index }}&amp;quantity=0" class="btn btn--small btn--secondary cart__remove"><img class="remove__image" src="{{ 'Cross.svg' | file_url }}" alt="Remove Button">
                         {% comment %}{{ 'cart.general.remove' | t }}{% endcomment %}</a>
                     </p>
                     {% endif %}
+                    <!------------->
+                    
                   </td>
                 </tr>
              {% endfor %}
